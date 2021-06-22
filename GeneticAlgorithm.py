@@ -30,10 +30,10 @@ class GeneticAlgorithm():
         r(float): Fraction of population to replace by Crossover each iteration
         m(float): Fraction of new population to mutate each iteration
         length(int): length of each individual
-        iterations(int): number of populations generate -> num steps
-        generationFitness(list[int]): The max fitness for each generation/step
+        generation(int): number of populations generate
+        generationFitness(tuple[int]): The max fitness for each generation
         """
-        self.iterations = 0
+        self.generation = 0
         self.generationalFitness = []
         self.threshold = threshold
         self.population = []
@@ -44,6 +44,8 @@ class GeneticAlgorithm():
 
         for x in range(self.p):
             self.population.append(self.generateHypothesis(length))
+
+        self.run()
 
     def generateHypothesis(self, length:int)->str:
         """
@@ -87,7 +89,7 @@ class GeneticAlgorithm():
         fitnessScores = []
         for individual in self.population:
             fitnessScores.append(self.fitness(individual))
-        self.generationalFitness.append((self.iterations, max(fitnessScores)))
+        self.generationalFitness.append((self.generation, max(fitnessScores), np.average(fitnessScores)))
         return fitnessScores
 
     def run(self):
@@ -96,7 +98,7 @@ class GeneticAlgorithm():
         print(self)
 
         while max(self.fitnessScores) < self.threshold:
-            self.iterations += 1
+            self.generation += 1
             newPopulation = []
             weights = [] # population weights
 
@@ -135,16 +137,17 @@ class GeneticAlgorithm():
             print(self)
 
         self.plotFitness()
-        return self.population
+        return sorted(self.population, key=self.fitness, reverse=True)
 
     def plotFitness(self):
         """
         Display the fitness level over each iteration in a time-series plot
         """
         plt.plot(*zip(*self.generationalFitness))
-        plt.ylabel('fitness')
-        plt.xlabel('iterations')
-        plt.title("Max Population Fitness Over Time")
+        plt.legend(['max', 'avg'])
+        plt.ylabel('Fitness')
+        plt.xlabel('Generation')
+        plt.title("Population fitness over time")
         plt.show()
         
     def crossOver(self, mother:str, father:str):
@@ -194,12 +197,10 @@ class GeneticAlgorithm():
         return ''.join(individual)
 
     def __str__(self):
-        return "ITERATION {} : {}".format(self.iterations, sorted(self.population, key=self.fitness, reverse=True))
-
+        return "GENERATION {} : {}".format(self.generation, sorted(self.population, key=self.fitness, reverse=True))
 
 def main():
     ga = GeneticAlgorithm(threshold=15, p=10, r=0.3, m=0.05, length=15)
-    ga.run()
 
 if __name__ == "__main__":
     main()
