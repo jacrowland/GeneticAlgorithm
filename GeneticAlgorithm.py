@@ -47,7 +47,7 @@ class GeneticAlgorithm():
 
     def generateHypothesis(self, length:int)->str:
         """
-        
+
         Generate a new binary hypothesis string
 
         Parameters:
@@ -97,14 +97,14 @@ class GeneticAlgorithm():
 
         while max(self.fitnessScores) < self.threshold:
             self.iterations += 1
+            newPopulation = []
+            weights = [] # population weights
 
             # probabilistically select (1-r)*p individuals from the population to bring into the new population
-            weights = []
             for individual in self.population:
                 individualWeight = self.fitness(individual) / sum(self.fitnessScores)
                 weights.append(individualWeight)
             numToSelect = round((1 - self.r) * len(self.population))
-
             newPopulation = list(np.random.choice(self.population,numToSelect,replace=False, p=weights))
 
             # cross-over (r * p) / 2 pairs
@@ -118,6 +118,10 @@ class GeneticAlgorithm():
 
             # mutate m fraction of the new population
             numToMutate = round(len(newPopulation) * self.m)
+            """
+            if numToMutate < 1 and numToMutate >= 0:
+                numToMutate = 1
+            """
             indices = random.sample(range(0, len(newPopulation)), numToMutate)
             for i in indices:
                 newPopulation[i] = self.mutate(newPopulation[i])
@@ -158,7 +162,6 @@ class GeneticAlgorithm():
         tuple(str, str): A tuple containing two new hypothesis strings
 
         """
-        # single-point crossOver
         son = ""
         daughter = ""
         point = random.randrange(0, len(father))
@@ -193,8 +196,9 @@ class GeneticAlgorithm():
     def __str__(self):
         return "ITERATION {} : {}".format(self.iterations, sorted(self.population, key=self.fitness, reverse=True))
 
+
 def main():
-    ga = GeneticAlgorithm(threshold=20, p=30, r=0.2, m=0.2, length=20)
+    ga = GeneticAlgorithm(threshold=15, p=10, r=0.3, m=0.05, length=15)
     ga.run()
 
 if __name__ == "__main__":
