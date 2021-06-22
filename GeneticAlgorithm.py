@@ -11,21 +11,20 @@ Author: Jacob Rowland 2021
 class GeneticAlgorithm():
     """ 
     
-    implementation of standard genetic algorithm for binary strings
+    Implementation of the standard genetic algorithm for binary strings
 
-    This class iterates a population of individuals by evaluating their fitness at each iterations.
+    This class iterates a population of individuals by evaluating their fitness at each iteration (step).
     The simulation stops when an individual in the current population reaches the threshold fitness value.
 
     Characteristics include:
-    - Ability to reproduce itself
-    - Self-reproducing entities
-    - variety amongst individuals
-    - fitness function defined as the number of 1's in an individual hypothesis
+    - Ability to for individuals to reproduce themselves (using single-point cross-over)
+    - Variety amongst individuals through mutation
+    - Evaluation score from Fitness function defined as the number of 1's in an individual hypothesis
 
     """
     def __init__(self, threshold=15, p=10, r=0.2, m=0.2, length=15):
         """
-        Parmaters:
+        Parameters:
         threshold(int): Fitness threshold - stop's simulation when an individual in the population reaches this value
         p(int): Number of members in the population
         r(float): Fraction of population to replace by Crossover each iteration
@@ -48,9 +47,10 @@ class GeneticAlgorithm():
 
     def generateHypothesis(self, length:int)->str:
         """
+        
         Generate a new binary hypothesis string
 
-        Paramater:
+        Parameters:
         length(int): The length of the hypothesis string
 
         Returns:
@@ -68,7 +68,7 @@ class GeneticAlgorithm():
 
         For this simulation it assigns a higher fitness based on the number of 1s in the hypothesis
 
-        Paramaters:
+        Parameters:
         individual(str): An individual hypothesis
 
         Returns:
@@ -77,7 +77,13 @@ class GeneticAlgorithm():
         # eval score given based on num. of 1s in string
         return individual.count("1")
 
-    def evaluatePopulationFitness(self):
+    def evaluatePopulationFitness(self)->list:
+        """
+        Evaluate the fitness of the entire population
+
+        Returns:
+        list: Fitness scores for each hypothesis in the population
+        """
         fitnessScores = []
         for individual in self.population:
             fitnessScores.append(self.fitness(individual))
@@ -85,7 +91,7 @@ class GeneticAlgorithm():
         return fitnessScores
 
     def run(self):
-        self.fitnessScores = self.evaluatePopulationFitness()
+        self.fitnessScores = self.evaluatePopulationFitness() # evaluate initial population
 
         print(self)
 
@@ -124,9 +130,8 @@ class GeneticAlgorithm():
 
             print(self)
 
-        print(self.plotFitness())
+        self.plotFitness()
         return self.population
-
 
     def plotFitness(self):
         """
@@ -138,7 +143,6 @@ class GeneticAlgorithm():
         plt.title("Max Population Fitness Over Time")
         plt.show()
         
-
     def crossOver(self, mother:str, father:str):
         """
         This function implements single-point cross-over. That is, it takes two population 
@@ -146,7 +150,7 @@ class GeneticAlgorithm():
         the parents at a random indices and crossing over the halves. e.g. splitting 10101010
         and 00101010 at the midway point results in 10101010 and 00101010
 
-        Paramaters:
+        Parameters:
         mother(str): An individual hypothesis
         father(str): An individual hypothesis
 
@@ -171,7 +175,7 @@ class GeneticAlgorithm():
         Takes an individual and mutates them by randomly switching one of their bits.
             e.g. a 1 to a 0 or vice versa
 
-        Paramaters:
+        Parameters:
         individual(str): An individual hypothesis from the population
 
         Returns:
@@ -190,8 +194,7 @@ class GeneticAlgorithm():
         return "ITERATION {} : {}".format(self.iterations, sorted(self.population, key=self.fitness, reverse=True))
 
 def main():
-    ga = GeneticAlgorithm()
-    print(ga.population)
+    ga = GeneticAlgorithm(threshold=20, p=30, r=0.2, m=0.2, length=20)
     ga.run()
 
 if __name__ == "__main__":
